@@ -1,0 +1,18 @@
+{
+  "containerName": "dragdroptools-fullstack",
+  "tag": "v0.0.1",
+  "prePushHook": {
+    "cmdList": [
+      "git clone git@github.com:BroCorpLabs/dragdrop.tools.git staging/dragdrop.tools",
+      "cp staging/dragdrop.tools/.env ./containers/dragdroptools-fullstack/.env",
+      "mv staging/dragdrop.tools/* ./containers/dragdroptools-fullstack"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/dragdroptools-fullstack",
+      "blueGreenDeploymentName": "dragdroptools"
+    }
+  }
+}

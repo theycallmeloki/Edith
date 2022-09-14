@@ -1,0 +1,36 @@
+{
+    "containerName": "ph-datumzipper",
+    "prePushHook": {
+        "cmdList": [
+            // "pachctl delete repo phzipper",
+            // "pachctl delete pipeline phzipper"
+        ]
+    },
+    "postPushHook": {
+        "cmdList": [
+            "pachctl create pipeline -f /tmp/thispipeline.json"
+        ],
+        "pipeline": {
+            "pipeline": {
+                "name": "phzipper"
+            },
+            "input": {
+                "pfs": {
+                    "glob": "/",
+                    "repo": "phmerged"
+                }
+            },
+            "transform": {
+                "image_pull_secrets": [
+                    "laneonekey"
+                ],
+                "cmd": [
+                    "python3",
+                    "/app/zipper.py",
+                    "phmerged"
+                ],
+                "image": ""
+            }
+        }
+    }
+}

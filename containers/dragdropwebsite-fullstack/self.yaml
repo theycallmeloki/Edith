@@ -1,0 +1,41 @@
+apiVersion: ctl.enisoc.com/v1
+kind: BlueGreenDeployment
+metadata:
+  name: dragdropwebsite
+  labels:
+    app: dragdropwebsite
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: dragdropwebsite
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: dragdropwebsite
+        component: frontend
+    spec:
+      containers:
+        - name: dragdropwebsite
+          image: { { registryWithimgAndTag } }
+          ports:
+            - containerPort: 3000
+      imagePullPolicy: Always
+  service:
+    metadata:
+      name: dragdropwebsite-frontend
+      labels:
+        app: dragdropwebsite
+        component: frontend
+    spec:
+      type: NodePort
+      selector:
+        app: dragdropwebsite
+        component: frontend
+      ports:
+        - port: 3000
+          targetPort: 3000
+          protocol: TCP
+          nodePort: 31001

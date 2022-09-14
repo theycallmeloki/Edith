@@ -1,0 +1,17 @@
+{
+  "containerName": "servicehub-nodeback",
+  "tag": "v0.0.6",
+  "prePushHook": {
+    "cmdList": [
+      "git clone git@github.com:BroCorpLabs/NodeBack.git staging/NodeBack",
+      "mv staging/NodeBack/* ./containers/servicehub-nodeback"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/servicehub-nodeback",
+      "blueGreenDeploymentName": "nodeback"
+    }
+  }
+}

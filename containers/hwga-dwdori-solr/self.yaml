@@ -1,0 +1,37 @@
+apiVersion: ctl.enisoc.com/v1
+kind: BlueGreenDeployment
+metadata:
+  name: hwga-dwdori-solr
+  labels:
+    app: hwga-dwdori-solr
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: hwga-dwdori-solr
+  template:
+    metadata:
+      labels:
+        app: hwga-dwdori-solr
+    spec:
+      containers:
+        - name: hwga-dwdori-solr
+          image: { { imgWithTag } }
+          ports:
+            - containerPort: 8983
+      imagePullPolicy: Always
+  service:
+    metadata:
+      name: hwga-dwdori-solr-svc
+      labels:
+        app: hwga-dwdori-solr
+    spec:
+      type: NodePort
+      selector:
+        app: hwga-dwdori-solr
+      ports:
+        - port: 8983
+          targetPort: 8983
+          protocol: TCP
+          nodePort: 31006

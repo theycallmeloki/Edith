@@ -1,0 +1,52 @@
+{
+  "containerName": "lipsync-inference",
+  "prePushHook": {
+    "cmdList": [
+      "pachctl delete repo lipsyncinferencer",
+      "pachctl delete pipeline lipsyncinferencer",
+      "pachctl delete repo lipsyncvideo",
+      "pachctl delete repo lipsyncaudio",
+      "pachctl create repo lipsyncvideo",
+      // "pachctl put file lipsyncvideo@master -f dictator_orig.mp4",
+      "pachctl create repo lipsyncaudio",
+      // "pachctl put file lipsyncaudio@master -f dictator_audio_extracted.wav"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    "pipeline": {
+      "pipeline": {
+        "name": "lipsyncinferencer"
+      },
+      "input": {
+        "cross": [
+          {
+            "pfs": {
+              "glob": "/*",
+              "repo": "lipsyncvideo"
+            }
+          },
+          {
+            "pfs": {
+              "glob": "/*",
+              "repo": "lipsyncaudio"
+            }
+          }
+        ]
+      },
+      "transform": {
+        "cmd": [
+          "python3",
+          "/app/inference.py",
+          "--checkpoint_path",
+          "/app/face_detection/detection/sfd/s3fd.pth",
+          "--face",
+          "/pfs/lipsyncvideo/dictator_orig.mp4",
+          "--audio",
+          "/pfs/lipsyncaudio/dictator_audio_extracted.wav"
+        ],
+        "image": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "containerName": "ffmpeg-simpleconvert",
+  "prePushHook": {
+    "cmdList": [
+      "echo y | pachctl delete all",
+      "pachctl create repo videos",
+    ]
+  },
+  "postPushHook": {
+    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    "pipeline": {
+        "pipeline": {
+            "name": "converter"
+        },
+        "description": "A pipeline that encodes videos",
+        "input": {
+            "pfs": {
+            "glob": "/*",
+            "repo": "videos"
+            }
+        },
+        "transform": {
+            "image_pull_secrets": [
+                "laneonekey"
+            ],
+            "cmd": ["python3", "/converter.py"],
+            "image": ""
+        }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+apiVersion: ctl.enisoc.com/v1
+kind: BlueGreenDeployment
+metadata:
+  name: goback
+  labels:
+    app: goback
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: goback
+  template:
+    metadata:
+      labels:
+        app: goback
+    spec:
+      containers:
+        - name: goback
+          image: { { imgWithTag } }
+          ports:
+            - containerPort: 8080
+      imagePullPolicy: Always
+  service:
+    metadata:
+      name: goback-svc
+      labels:
+        app: goback
+    spec:
+      type: NodePort
+      selector:
+        app: goback
+      ports:
+        - port: 8080
+          targetPort: 8080
+          protocol: TCP
+          nodePort: 31004

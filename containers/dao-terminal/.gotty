@@ -1,0 +1,5 @@
+preferences {
+    font_size = 12
+    background_color = "rgb(16, 16, 32)"
+    foreground_color = "rgb(3, 245, 68)"
+}

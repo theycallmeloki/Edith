@@ -1,0 +1,41 @@
+apiVersion: ctl.enisoc.com/v1
+kind: BlueGreenDeployment
+metadata:
+  name: sentimentanalysis
+  labels:
+    app: sentimentanalysis
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: sentimentanalysis
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: sentimentanalysis
+        component: frontend
+    spec:
+      containers:
+        - name: sentimentanalysis
+          image: { { imgWithTag } }
+          ports:
+            - containerPort: 8080
+      imagePullPolicy: Always
+  service:
+    metadata:
+      name: sentimentanalysis-frontend
+      labels:
+        app: sentimentanalysis
+        component: frontend
+    spec:
+      type: NodePort
+      selector:
+        app: sentimentanalysis
+        component: frontend
+      ports:
+        - port: 8080
+          targetPort: 8080
+          protocol: TCP
+          nodePort: 31009

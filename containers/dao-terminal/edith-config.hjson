@@ -1,0 +1,16 @@
+{
+  "containerName": "dao-terminal",
+  "tag": "v1.0.1",
+  "prePushHook": {
+    "cmdList": [
+      // "cp /home/laneone/.pachyderm/config.json /home/laneone/Documents/Edith/containers/dao-terminal/config.json",
+      // "cp /home/laneone/.kube/config /home/laneone/Documents/Edith/containers/dao-terminal/config"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": [
+      // "rm /home/laneone/Documents/Edith/containers/dao-terminal/config.json",
+      // "rm /home/laneone/Documents/Edith/containers/dao-terminal/config"
+    ]
+  }
+}

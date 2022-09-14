@@ -1,0 +1,37 @@
+apiVersion: ctl.enisoc.com/v1
+kind: BlueGreenDeployment
+metadata:
+    name: moser
+    labels:
+        app: moser
+spec:
+    replicas: 1
+    minReadySeconds: 5
+    selector:
+        matchLabels:
+            app: moser
+    template:
+        metadata:
+            labels:
+                app: moser
+        spec:
+            containers:
+                - name: moser
+                  image: { { imgWithTag } }
+                  ports:
+                      - containerPort: 3000
+            imagePullPolicy: Always
+    service:
+        metadata:
+            name: moser-svc
+            labels:
+                app: moser
+        spec:
+            type: NodePort
+            selector:
+                app: moser
+            ports:
+                - port: 3000
+                  targetPort: 3000
+                  protocol: TCP
+                  nodePort: 31007

@@ -1,0 +1,33 @@
+{
+  "containerName": "simple-blender-framesplitter",
+  "prePushHook": {
+    "cmdList": [
+      "pachctl delete repo splitter",
+      "pachctl delete pipeline splitter",
+      "pachctl delete repo blends",
+      "pachctl create repo blends",
+      # redacted
+    ]
+  },
+  "postPushHook": {
+    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    "pipeline": {
+      "pipeline": {
+        "name": "splitter"
+      },
+      "input": {
+        "pfs": {
+          "glob": "/*",
+          "repo": "blends"
+        }
+      },
+      "transform": {
+        "image_pull_secrets": [
+          "laneonekey"
+        ],
+        "cmd": ["python3", "/splitter.py", "blends"],
+        "image": ""
+      }
+    }
+  }
+}

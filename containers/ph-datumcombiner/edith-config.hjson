@@ -1,0 +1,53 @@
+{
+    "containerName": "ph-datumcombiner",
+    "prePushHook": {
+        "cmdList": [
+        ]
+    },
+    "postPushHook": {
+        "cmdList": [
+            "pachctl create pipeline -f /tmp/thispipeline.json"
+        ],
+        "pipeline": {
+            "pipeline": {
+                "name": "phmerged"
+            },
+            "input": {
+                "join": [
+                    {
+                        "pfs": {
+                            "repo": "phmeta",
+                            "branch": "master",
+                            "glob": "/(*)",
+                            "join_on": "$1"
+                        }
+                    },
+                    {
+                        "pfs": {
+                            "repo": "phinsights",
+                            "branch": "master",
+                            "glob": "/(*)",
+                            "join_on": "$1"
+                        }
+                    }
+                ]
+            },
+            parallelism_spec: {
+                "constant": 4
+            },
+            "transform": {
+                "image_pull_secrets": [
+                    "laneonekey"
+                ],
+                "cmd": [
+                    "python3",
+                    "/app/merger.py",
+                    "phmeta",
+                    "phinsights"
+                ],
+                "image": "",
+                "err_cmd": ["true"]
+            }
+        }
+    }
+}

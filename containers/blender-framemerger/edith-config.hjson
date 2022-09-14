@@ -1,0 +1,30 @@
+{
+  "containerName": "blender-framemerger",
+  "prePushHook": {
+    "cmdList": [
+      "pachctl delete repo merger",
+      "pachctl delete pipeline merger",
+    ]
+  },
+  "postPushHook": {
+    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    "pipeline": {
+      "pipeline": {
+        "name": "merger"
+      },
+      "input": {
+        "pfs": {
+          "glob": "/*/",
+          "repo": "renderer"
+        }
+      },
+      "transform": {
+        "image_pull_secrets": [
+          "laneonekey"
+        ],
+        "cmd": ["python3", "/merger.py", "renderer"],
+        "image": ""
+      }
+    }
+  }
+}

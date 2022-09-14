@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: builder
+  labels:
+    app: dragdropwebsite-kaniko
+spec:
+  template:
+    spec:
+      containers:
+        - name: build
+          image: gcr.io/kaniko-project/executor:debug
+          args:
+            [
+              "-c",
+              "gs://buildsforever1/{ { img } }.tar.gz",
+              "--context-sub-path",
+              "{ { img } }",
+              "-d",
+              "{ { containerRegistry } }/{ { imgWithTag } }",
+            ]
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secret/kaniko-secret.json
+          volumeMounts:
+            - name: build-context
+              mountPath: /workspace
+            - name: kaniko-secret
+              mountPath: /secret
+      restartPolicy: Never
+      volumes:
+        - name: build-context
+          emptyDir: {}
+        - name: kaniko-secret
+          secret:
+            secretName: kaniko-secret

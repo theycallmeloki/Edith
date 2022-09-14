@@ -1,0 +1,14 @@
+{
+  "containerName": "openfaas-sentimentanalysis",
+  "tag": "v0.0.1",
+  "prePushHook": {
+    "cmdList": []
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/openfaas-sentimentanalysis",
+      "blueGreenDeploymentName": "sentimentanalysis"
+    }
+  }
+}

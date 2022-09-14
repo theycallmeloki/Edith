@@ -1,0 +1,14 @@
+{
+  "containerName": "servicehub-moser",
+  "tag": "v0.0.3",
+  "prePushHook": {
+    "cmdList": []
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/servicehub-moser",
+      "blueGreenDeploymentName": "moser"
+    }
+  }
+}

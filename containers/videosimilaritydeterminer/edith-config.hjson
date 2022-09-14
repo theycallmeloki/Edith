@@ -1,0 +1,49 @@
+{
+    "containerName": "videosimilaritydeterminer",
+    "prePushHook": {
+        "cmdList": [
+            "pachctl create repo vsdsource",
+            # redacted 1
+            # redacted 2
+        ]
+    },
+    "postPushHook": {
+        "cmdList": [
+            "pachctl create pipeline -f /tmp/thispipeline.json"
+        ],
+        "pipeline": {
+            "pipeline": {
+                "name": "vsd"
+            },
+            "input": {
+                "cross": [
+                    {
+                        "pfs": {
+                            "name": "A",
+                            "glob": "/j1a.mp4",
+                            "repo": "vsdsource"
+                        }
+                    },
+                    {
+                        "pfs": {
+                            "name": "B",
+                            "glob": "/j1b.mp4",
+                            "repo": "vsdsource"
+                        }
+                    }
+                ]
+            },
+            "transform": {
+                "image_pull_secrets": [
+                    "laneonekey"
+                ],
+                "cmd": [
+                    "python3",
+                    "/testone.py",
+                    "vsdsource"
+                ],
+                "image": ""
+            }
+        }
+    }
+}

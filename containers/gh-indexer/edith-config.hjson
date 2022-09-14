@@ -1,0 +1,37 @@
+{
+  "containerName": "gh-indexer",
+  "prePushHook": {
+    "cmdList": [
+      "pachctl delete repo ghindexer",
+      "pachctl delete pipeline ghindexer",
+      "pachctl delete repo ghdatumindex",
+      "pachctl create repo ghdatumindex",
+      "mkdir datums",
+      "python3 containers/gh-indexer/datumreturner.py",
+      "ls",
+      "tar -cvzf index.tar.gz ./datums/",
+      "ls",
+      "pachctl put file --progress ghdatumindex@master:/index.tar.gz -f index.tar.gz",
+      "rm -rf datums",
+      "rm -rf index.tar.gz"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    "pipeline": {
+      "pipeline": {
+        "name": "ghindexer"
+      },
+      "input": {
+        "pfs": {
+          "glob": "/*",
+          "repo": "ghdatumindex"
+        }
+      },
+      "transform": {
+        "cmd": ["python3", "/app/collector.py", "ghdatumindex"],
+        "image": ""
+      }
+    }
+  }
+}

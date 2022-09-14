@@ -1,0 +1,18 @@
+{
+  "containerName": "hwga-dwdori",
+  "tag": "v0.0.7",
+  "prePushHook": {
+    "cmdList": [
+      "git clone git@github.com:theycallmeloki/hwga-dwdori.git staging/hwga-dwdori",
+      "cp staging/hwga-dwdori/.env ./containers/hwga-dwdori/.env",
+      "mv staging/hwga-dwdori/* ./containers/hwga-dwdori"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/hwga-dwdori",
+      "blueGreenDeploymentName": "hwga-dwdori"
+    }
+  }
+}

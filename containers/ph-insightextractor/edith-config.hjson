@@ -1,0 +1,40 @@
+{
+    "containerName": "ph-insightextractor",
+    "prePushHook": {
+        "cmdList": [
+            "pachctl delete repo phinsights",
+            "pachctl delete pipeline phinsights"
+        ]
+    },
+    "postPushHook": {
+        "cmdList": [
+            "pachctl create pipeline -f /tmp/thispipeline.json"
+        ],
+        "pipeline": {
+            "pipeline": {
+                "name": "phinsights"
+            },
+            "input": {
+                "pfs": {
+                    "glob": "/*",
+                    "repo": "phsource"
+                }
+            },
+            parallelism_spec: {
+                "constant": 2
+            },
+            "transform": {
+                "image_pull_secrets": [
+                    "laneonekey"
+                ],
+                "cmd": [
+                    "python3",
+                    "/app/extractor.py",
+                    "phsource"
+                ],
+                "image": "",
+                "err_cmd": ["true"]
+            }
+        }
+    }
+}

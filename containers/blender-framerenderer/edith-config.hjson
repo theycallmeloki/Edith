@@ -1,0 +1,38 @@
+{
+  "containerName": "blender-framerenderer",
+  "prePushHook": {
+    "cmdList": [
+      // "pachctl delete repo renderer",
+      // "pachctl delete pipeline renderer",
+    ]
+  },
+  "postPushHook": {
+    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    "pipeline": {
+      "pipeline": {
+        "name": "renderer"
+      },
+      "input": {
+        "cross": [{
+            "pfs": {
+                "glob": "/*",
+                "repo": "blends"
+            }
+        },
+        {
+            "pfs": {
+                "glob": "/*/*",
+                "repo": "splitter"
+            }
+        }]
+      },
+      "transform": {
+        "image_pull_secrets": [
+          "laneonekey"
+        ],
+        "cmd": ["python3", "/render.py", "blends", "splitter"],
+        "image": ""
+      }
+    }
+  }
+}

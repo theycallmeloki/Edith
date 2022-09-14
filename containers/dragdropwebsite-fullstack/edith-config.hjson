@@ -1,0 +1,18 @@
+{
+  "containerName": "dragdropwebsite-fullstack",
+  "tag": "v0.0.44",
+  "prePushHook": {
+    "cmdList": [
+      "git clone git@github.com:BroCorpLabs/dragdrop.website.git staging/dragdrop.website",
+      "cp staging/dragdrop.website/.env ./containers/dragdropwebsite-fullstack/.env",
+      "mv staging/dragdrop.website/* ./containers/dragdropwebsite-fullstack"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/dragdropwebsite-fullstack",
+      "blueGreenDeploymentName": "dragdropwebsite"
+    }
+  }
+}

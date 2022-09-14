@@ -1,0 +1,218 @@
+diff --git a/node_modules/auto-git-update/index.js b/node_modules/auto-git-update/index.js
+index 2371008..6479067 100644
+--- a/node_modules/auto-git-update/index.js
++++ b/node_modules/auto-git-update/index.js
+@@ -8,11 +8,11 @@ const git = require('simple-git');
+ const Logger = require('chegs-simple-logger');
+ 
+ /** 
+- * @typedef Config - Configuration for Auto Git Update
++ * @typedef Config - Configuration for Edith
+  * @param {String} repository - The url to the root of a git repository to update from. 
+  * @param {String} branch - The branch to update from. Defaults to master.
+  * @param {String} token - A personal access token used for accessions private repositories. 
+- * @param {String} tempLocation - The local dir to save temporary information for Auto Git Update.
++ * @param {String} tempLocation - The local dir to save temporary information for Edith.
+  * @param {Array[String]} ignoreFiles - An array of files to not install when updating. Useful for config files. 
+  * @param {String} executeOnComplete - A command to execute after an update completes. Good for restarting the app.
+  * @param {Boolean} exitOnComplete - Use process exit to stop the app after a successful update.
+@@ -22,7 +22,7 @@ const Logger = require('chegs-simple-logger');
+ const cloneSubdirectory = '/AutoGitUpdate/repo/';
+ const backupSubdirectory = '/AutoGitUpdate/backup/';
+ 
+-// Enable during testing to prevent overwrite of Auto Git Update
++// Enable during testing to prevent overwrite of Edith
+ const testing = false;
+ 
+ // Create a new simple logger. This can be updated to use a new configuration by calling setLogConfig()
+@@ -31,8 +31,8 @@ let log = new Logger({});
+ log.logGeneral = true;
+ log.logWarning = true;
+ log.logError   = true;
+-log.logDetail  = false;
+-log.logDebug   = false;
++log.logDetail  = true;
++log.logDebug   = true;
+ 
+ module.exports = class AutoGitUpdate {
+     /**
+@@ -46,13 +46,13 @@ module.exports = class AutoGitUpdate {
+         if (updateConfig.branch == undefined) updateConfig.branch = 'master';
+         if (updateConfig.tempLocation == undefined) throw new Error('You must define a temp location for cloning the repository');
+ 
+-        // Validate that Auto Git Update is being used as a dependency or testing is enabled
+-        // This is to prevent the Auto Git Update module from being overwritten on accident during development
++        // Validate that Edith is being used as a dependency or testing is enabled
++        // This is to prevent the Edith module from being overwritten on accident during development
+         if (!testing) {
+             let file = path.join(appRootPath.path, 'package.json');
+             let appPackage = fs.readFileSync(file);
+             appPackage = JSON.parse(appPackage);
+-            if (appPackage.name == 'auto-git-update') throw new Error('Auto Git Update is not being ran as a dependency & testing is not enabled.');
++            if (appPackage.name == 'auto-git-update') throw new Error('Edith is not being ran as a dependency & testing is not enabled.');
+         }
+ 
+         config = updateConfig;
+@@ -78,15 +78,15 @@ module.exports = class AutoGitUpdate {
+      */
+     async compareVersions() {
+         try {
+-            log.general('Auto Git Update - Comparing versions...');
++            log.general('Edith - Comparing versions...');
+             let currentVersion = readAppVersion();
+             let remoteVersion = await readRemoteVersion();
+-            log.general('Auto Git Update - Current version: ' + currentVersion);
+-            log.general('Auto Git Update - Remote Version: ' + remoteVersion);
++            log.general('Edith - Current version: ' + currentVersion);
++            log.general('Edith - Remote Version: ' + remoteVersion);
+             if (currentVersion == remoteVersion) return {upToDate: true, currentVersion};
+             return {upToDate: false, currentVersion, remoteVersion};
+         }catch(err) {
+-            log.error('Auto Git Update - Error comparing local and remote versions.');
++            log.error('Edith - Error comparing local and remote versions.');
+             log.error(err);
+             return {upToDate: false, currentVersion: 'Error', remoteVersion: 'Error'}
+         }
+@@ -100,17 +100,19 @@ module.exports = class AutoGitUpdate {
+      */
+     async forceUpdate() {
+         try {
+-            log.general('Auto Git Update - Updating application from ' + config.repository);
++            log.general('Edith - Updating application from ' + config.repository);
+             await downloadUpdate();
+             await backupApp();
+             await installUpdate();
+-            await installDependencies();
+-            log.general('Auto Git Update - Finished installing updated version.');
++            if (config.purgeAndReinstallPackages) {
++                await installDependencies();
++            }
++            log.general('Edith - Finished installing updated version.');
+             if (config.executeOnComplete) await promiseBlindExecute(config.executeOnComplete);
+             if (config.exitOnComplete) process.exit(1);
+             return true;
+         }catch(err) {
+-            log.error('Auto Git Update - Error updating application');
++            log.error('Edith - Error updating application');
+             log.error(err);
+             return false;
+         }
+@@ -129,7 +131,7 @@ module.exports = class AutoGitUpdate {
+ }
+ 
+ ////////////////////////////
+-// AUTO GIT UPDATE FUNCTIONS 
++// Edith FUNCTIONS 
+ 
+ /**
+  * Creates a backup of the application, including node modules. 
+@@ -137,7 +139,7 @@ module.exports = class AutoGitUpdate {
+  */
+ async function backupApp() {
+     let destination = path.join(config.tempLocation, backupSubdirectory);
+-    log.detail('Auto Git Update - Backing up app to ' + destination);
++    log.detail('Edith - Backing up app to ' + destination);
+     await fs.ensureDir(destination);
+     await fs.copy(appRootPath.path, destination, {dereference: true});
+     return true;
+@@ -157,8 +159,8 @@ async function downloadUpdate() {
+ 
+     // Empty destination directory & clone repo
+     let destination = path.join(config.tempLocation, cloneSubdirectory);
+-    log.detail('Auto Git Update - Cloning ' + repo);
+-    log.detail('Auto Git Update - Destination: ' + destination);
++    log.detail('Edith - Cloning ' + repo);
++    log.detail('Edith - Destination: ' + destination);
+     await fs.ensureDir(destination);
+     await fs.emptyDir(destination);
+     await promiseClone(repo, destination, config.branch);
+@@ -172,23 +174,23 @@ function installDependencies() {
+     return new Promise(function(resolve, reject) {
+         //If testing is enabled, use alternative path to prevent overwrite of app. 
+         let destination = testing ? path.join(appRootPath.path, '/testing/'): appRootPath.path;
+-        log.detail('Auto Git Update - Installing application dependencies in ' + destination);
++        log.detail('Edith - Installing application dependencies in ' + destination);
+         // Generate and execute command
+-        let command = `cd ${destination} && npm install`;
++        let command = `cd ${destination} && rm -rf node_modules && npm install && tsc`;
+         let child = exec(command);
+ 
+         // Wait for results
+         child.stdout.on('end', resolve);
+-        child.stdout.on('data', data => log.general('Auto Git Update - npm install: ' + data.replace(/\r?\n|\r/g, '')));
++        child.stdout.on('data', data => log.general('Edith - npm install: ' + data.replace(/\r?\n|\r/g, '')));
+         child.stderr.on('data', data => {
+             if (data.toLowerCase().includes('error')) {
+                 // npm passes warnings as errors, only reject if "error" is included
+                 data = data.replace(/\r?\n|\r/g, '');
+-                log.error('Auto Git Update - Error installing dependencies');
+-                log.error('Auto Git Update - ' + data);
++                log.error('Edith - Error installing dependencies');
++                log.error('Edith - ' + data);
+                 reject();
+             }else{
+-                log.warning('Auto Git Update - ' + data);
++                log.warning('Edith - ' + data);
+             }
+         });
+     });
+@@ -201,10 +203,10 @@ function installDependencies() {
+ async function installUpdate() {
+     // Remove ignored files from the new version
+     if (config.ignoreFiles) {
+-        log.detail('Auto Git Update - Purging ignored files from the update');
++        log.detail('Edith - Purging ignored files from the update');
+         config.ignoreFiles.forEach(file => {
+             file = path.join(config.tempLocation, cloneSubdirectory, file);
+-            log.detail('Auto Git Update - Removing ' + file);
++            log.detail('Edith - Removing ' + file);
+             fs.unlinkSync(file);
+         });
+     }
+@@ -213,9 +215,9 @@ async function installUpdate() {
+     let source = path.join(config.tempLocation, cloneSubdirectory);
+     //If testing is enabled, use alternative path to prevent overwrite of app. 
+     let destination = testing ? path.join(appRootPath.path, '/testing/'): appRootPath.path;
+-    log.detail('Auto Git Update - Installing update...');
+-    log.detail('Auto Git Update - Source: ' + source);
+-    log.detail('Auto Git Update - Destination: ' + destination);
++    log.detail('Edith - Installing update...');
++    log.detail('Edith - Source: ' + source);
++    log.detail('Edith - Destination: ' + destination);
+     await fs.ensureDir(destination);
+     await fs.copy(source, destination);
+     return true;
+@@ -226,7 +228,7 @@ async function installUpdate() {
+  */
+ function readAppVersion() {
+     let file = path.join(appRootPath.path, 'package.json');
+-    log.detail('Auto Git Update - Reading app version from ' + file);
++    log.detail('Edith - Reading app version from ' + file);
+     let appPackage = fs.readFileSync(file);
+     return JSON.parse(appPackage).version;
+ }
+@@ -240,7 +242,7 @@ async function readRemoteVersion() {
+     let url = config.repository + `/${config.branch}/package.json`;
+     if (url.includes('github')) url = url.replace('github.com', 'raw.githubusercontent.com');
+     if (config.token) options.headers = {Authorization: `token ${config.token}`}
+-    log.detail('Auto Git Update - Reading remote version from ' + url);
++    log.detail('Edith - Reading remote version from ' + url);
+     // Send request for repositories raw package.json file
+     try {
+         let body = await promiseHttpsRequest(url, options);
+@@ -295,12 +297,12 @@ function promiseHttpsRequest(url, options) {
+             res.on('data', data => {body += data});
+             res.on('end', function() {
+                 if (res.statusCode == '200') return resolve(body);
+-                log.detail('Auto Git Update - Bad Response ' + res.statusCode);
++                log.detail('Edith - Bad Response ' + res.statusCode);
+                 reject(res.statusCode);
+             });
+         });
+-        log.detail('Auto Git Update - Sending request to ' + url);
+-        log.detail('Auto Git Update - Options: ' + JSON.stringify(options));
++        log.detail('Edith - Sending request to ' + url);
++        log.detail('Edith - Options: ' + JSON.stringify(options));
+         req.on('error', reject);
+         req.end();
+     }); 

@@ -1,0 +1,35 @@
+{
+    "containerName": "ph-datumcreator",
+    "prePushHook": {
+        "cmdList": [
+            "pachctl create repo phfile",
+        ]
+    },
+    "postPushHook": {
+        "cmdList": [
+            "pachctl create pipeline -f /tmp/thispipeline.json"
+        ],
+        "pipeline": {
+            "pipeline": {
+                "name": "phsource"
+            },
+            "input": {
+                "pfs": {
+                    "glob": "/*",
+                    "repo": "phfile"
+                }
+            },
+            "transform": {
+                "image_pull_secrets": [
+                    "laneonekey"
+                ],
+                "cmd": [
+                    "python3",
+                    "/app/creator.py",
+                    "phfile"
+                ],
+                "image": ""
+            }
+        }
+    }
+}

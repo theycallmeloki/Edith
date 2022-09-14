@@ -1,0 +1,21 @@
+{
+  "pipeline": {
+    "name": "ghindexer"
+  },
+  "input": {
+    "pfs": {
+      "glob": "/*",
+      "repo": "ghpreloadindex"
+    }
+  },
+  "transform": {
+    "cmd": [
+      "tar",
+      "-xvf",
+      "/pfs/ghpreloadindex/index.tar.gz",
+      "--directory",
+      "/pfs/out"
+    ],
+    "image": "ubuntu:18.04"
+  }
+}

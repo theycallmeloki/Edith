@@ -1,0 +1,17 @@
+{
+  "containerName": "hwga-dwdori-solr",
+  "tag": "v0.0.1",
+  "prePushHook": {
+    "cmdList": [
+      "git clone git@github.com:theycallmeloki/hwga-dwdori-solr.git staging/hwga-dwdori-solr",
+      "mv staging/hwga-dwdori-solr/* ./containers/hwga-dwdori-solr"
+    ]
+  },
+  "postPushHook": {
+    "cmdList": [],
+    "k8s": {
+      "selfLocation": "./containers/hwga-dwdori-solr",
+      "blueGreenDeploymentName": "hwga-dwdori-solr"
+    }
+  }
+}

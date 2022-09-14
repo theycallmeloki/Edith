@@ -1,0 +1,40 @@
+{
+    "containerName": "ph-metaextractor",
+    "prePushHook": {
+        "cmdList": [
+            "pachctl delete repo phmeta",
+            "pachctl delete pipeline phmeta",
+        ]
+    },
+    "postPushHook": {
+        "cmdList": [
+            "pachctl create pipeline -f /tmp/thispipeline.json"
+        ],
+        "pipeline": {
+            "pipeline": {
+                "name": "phmeta"
+            },
+            "input": {
+                "pfs": {
+                    "glob": "/*",
+                    "repo": "phsource"
+                }
+            },
+            parallelism_spec: {
+                "constant": 4
+            },
+            "transform": {
+                "image_pull_secrets": [
+                    "laneonekey"
+                ],
+                "cmd": [
+                    "python3",
+                    "/app/extractor.py",
+                    "phsource"
+                ],
+                "image": "",
+                "err_cmd": ["true"]
+            }
+        }
+    }
+}
