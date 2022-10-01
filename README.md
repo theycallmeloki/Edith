@@ -1,5 +1,9 @@
 # Edith
 
+A thin self-hostable CI/CD wrapper around Pachyderm/Kubernetes that helps a tiny (1-20 members) startup not think about setting up something as elaborate as Jenkins and ArgoCD to keep a cluster synced with GitOps 
+
+DISCLAIMER: This tool encapsulates what could be considered "best practices" for... bad practices. 
+
 ## To setup:
 
 Install dependencies with:
