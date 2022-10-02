@@ -1,8 +1,14 @@
 # Edith
 
-A thin self-hostable CI/CD wrapper around Pachyderm/Kubernetes that helps a tiny (1-20 members) startup not think about setting up something as elaborate as Jenkins and ArgoCD to keep a cluster synced with GitOps 
+A thin self-hostable CI/CD wrapper around Pachyderm/Kubernetes that helps a tiny (1-20 members) startup not think about setting up something as elaborate as Jenkins, ArgoCD and Airflow to keep a cluster delivering value
 
 DISCLAIMER: This tool encapsulates what could be considered "best practices" for... bad practices. 
+
+Background: 
+
+As a hipster sys-admin developer advocate, lurking on cloud-native, with an M1 macbook, I hit a severe roadblock being unable to build containers for x86_64 for use in cloud environments, most of which wouldn't accept an arm build, to overcome the same, `Edith` was created as a CI stopgap until docker buildx caught up on m1, along the way, I discovered [Metacontroller](https://github.com/metacontroller/metacontroller) and [Pachyderm](https://github.com/pachyderm/pachyderm) and found myself being able to ship infrastructure pieces supafast, I call this pattern `Do this, then that` or `DTTT`
+
+If none of this makes sense to you, much to learn you have, young padawan
 
 ## To setup:
 
@@ -30,6 +36,8 @@ To develop:
 
 
 ### TODO
+
+[ ] Support `.env` 
 
 [x] Find a way to compile prior to pm2 restarting the app after update
 
