@@ -22,6 +22,15 @@ Compile ts to js:
 
 Create an env file with the following: 
 
+```
+GITHUB_REPO=
+GITHUB_TOKEN=
+CONTAINER_REGISTRY=
+SLACK_API_KEY=
+DOCKERHUB_USERNAME=
+DOCKERHUB_PASSWORD=
+PUSHBULLET_API_KEY=
+```
 
 
 Run it with pm2 to auto-restart when updating:
