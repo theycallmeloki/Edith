@@ -16,19 +16,20 @@ import fetch from 'node-fetch';
 import AutoGitUpdate from 'auto-git-update';
 // @ts-ignore
 import PushBullet from 'pushbullet';
+import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Configuration
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const GITHUB_REPO = '';
-const GITHUB_TOKEN = '';
-const CONTAINER_REGISTRY = '';
-const SLACK_API_KEY =
-    '';
-const DOCKERHUB_USERNAME = '';
-const DOCKERHUB_PASSWORD = '';
-const PUSHBULLET_API_KEY = '';
+const GITHUB_REPO = process.env['GITHUB_REPO'];
+const GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
+const CONTAINER_REGISTRY = process.env['CONTAINER_REGISTRY'];
+const SLACK_API_KEY = process.env['SLACK_API_KEY'];
+const DOCKERHUB_USERNAME = process.env['DOCKERHUB_USERNAME'];
+const DOCKERHUB_PASSWORD = process.env['DOCKERHUB_PASSWORD'];
+const PUSHBULLET_API_KEY = process.env['PUSHBULLET_API_KEY'];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initializations
