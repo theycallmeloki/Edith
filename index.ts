@@ -4,11 +4,14 @@ import { execSync, spawn } from 'child_process';
 import { performance } from 'perf_hooks';
 import process from 'process';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { WebClient } from '@slack/web-api';
 import cheerio from 'cheerio';
 import minimist from 'minimist';
 import cron from 'node-cron';
+import multer from 'multer';
 import Hjson from 'hjson';
 // @ts-ignore
 import fetch from 'node-fetch';
@@ -16,7 +19,7 @@ import fetch from 'node-fetch';
 import AutoGitUpdate from 'auto-git-update';
 // @ts-ignore
 import PushBullet from 'pushbullet';
-import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+import * as dotenv from 'dotenv'; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 dotenv.config();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +62,8 @@ const web = new WebClient(SLACK_API_KEY);
 const containerLogs: any[] = [];
 const dockerHubUsername = DOCKERHUB_USERNAME;
 const dockerHubPassword = DOCKERHUB_PASSWORD;
+
+const userUploads = multer({ dest: 'user-uploads/' });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Interfaces
@@ -116,6 +121,7 @@ const changeDirectory = (dirLoc: string) => {
 };
 
 const purgeTagsForContainer = async (containerName: string, tag: string) => {
+    // purge unused tags to be nice to docker hub for providing a free tier
     const rawToken = await fetch('https://hub.docker.com/v2/users/login/', {
         body: JSON.stringify({
             username: dockerHubUsername,
@@ -199,7 +205,7 @@ const runPachctlCommand = (args: any[], callback: any) => {
 };
 
 const runBuildPushContainer = ({
-    containerName,
+    containerName = 'edith-images',
     folderName,
     tag = 'latest',
 }: {
@@ -324,6 +330,10 @@ const brobotPost = (message: string) => {
 // Routes
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+app.get('/', (req, res) => {
+    res.send({ message: 'Edith Ok!' });
+});
+
 app.post('/post', (req, res) => {
     res.send('Ack!');
     brobotPost(req.body['message']);
@@ -339,6 +349,84 @@ app.post('/runPachctlCommand', async (req, res) => {
     runPachctlCommand(req.body.args, function (output: any, exitCode: any) {
         res.send(output);
     });
+});
+
+app.post('/buildContainer', async (req, res) => {
+    // used from edith.lol
+    const {files} = req.body;
+    console.log(files);
+    const {name} = req.body;
+    console.log(name);
+
+    const preparedResponse: any = {};
+
+    let tmpDir: any;
+    const appPrefix = 'edith-temp-container-';
+    try {
+        tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), appPrefix));
+        // tmpDir = fs.mkdtempSync(path.join('./', appPrefix));
+        // the rest of your app goes here
+
+        console.log(`Created temp directory: ${tmpDir}`);
+
+        Object.keys(files).forEach((toWriteFile: any) => {
+            fs.writeFileSync(
+                `${tmpDir}/${toWriteFile}`,
+                files[toWriteFile],
+                {
+                    encoding: 'utf8',
+                },
+            );
+        });
+
+        const edithConfig = tagMerger(
+            Hjson.parse(files['edith-config.hjson']),
+            uuidv4(),
+        );
+
+        const t0 = performance.now();
+        const currentScriptDirectory = path.dirname(
+            fs.realpathSync(__filename),
+        );
+        console.log(currentScriptDirectory);
+        changeDirectory(tmpDir);
+
+        // TODO: purge unused tags
+
+        console.log('Building container...');
+        console.log(
+            `docker build --platform linux/amd64 -t ${containerRegistry}/edith-images:${edithConfig['tag']} .`,
+        );
+        runOne(
+            `docker build --platform linux/amd64 -t ${containerRegistry}/edith-images:${name}_${edithConfig['tag']} .`,
+        );
+        console.log('Pushing container...');
+        runOne(
+            `docker push ${containerRegistry}/edith-images:${name}_${edithConfig['tag']}`,
+        );
+        changeDirectory(currentScriptDirectory);
+
+        preparedResponse[
+            'edithImageTag'
+        ] = `${containerRegistry}/edith-images:${name}_${edithConfig['tag']}`;
+
+        const t1 = performance.now();
+    } catch {
+        // handle error
+    } finally {
+        try {
+            if (tmpDir) {
+                console.log(`Removing temp directory: ${tmpDir}`);
+                fs.rmSync(tmpDir, { recursive: true });
+            }
+        } catch (e) {
+            console.error(
+                `An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually. Error: ${e}`,
+            );
+        }
+    }
+
+    res.send(preparedResponse);
 });
 
 app.post('/buildContainers', (req: any, res: any) => {
@@ -490,12 +578,12 @@ cron.schedule('30 * * * *', () => {
 app.listen(port, () => {
     console.log(`Edith listening at http://0.0.0.0:${port}`);
 
-    fetch('http://localhost:8888/buildContainers', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+    // fetch('http://localhost:8888/buildContainers', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    // });
 
     // fetch('http://localhost:8888/runPachctlCommand', {
     //     method: 'POST',
