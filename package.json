@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/theycallmeloki/Edith#readme",
   "dependencies": {
+    "@banana-dev/banana-dev": "^4.0.0",
     "@brocorplabs/config": "^0.1.1",
     "@slack/web-api": "^6.4.0",
     "auto-git-update": "^2.0.2",

@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { WebClient } from '@slack/web-api';
 import cheerio from 'cheerio';
 import minimist from 'minimist';
+import * as banana from '@banana-dev/banana-dev';
 import cron from 'node-cron';
 import multer from 'multer';
 import Hjson from 'hjson';
@@ -33,6 +34,7 @@ const SLACK_API_KEY = process.env['SLACK_API_KEY'];
 const DOCKERHUB_USERNAME = process.env['DOCKERHUB_USERNAME'];
 const DOCKERHUB_PASSWORD = process.env['DOCKERHUB_PASSWORD'];
 const PUSHBULLET_API_KEY = process.env['PUSHBULLET_API_KEY'];
+const BANANA_API_KEY = process.env['BANANA_API_KEY'];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initializations
@@ -326,6 +328,14 @@ const brobotPost = (message: string) => {
     }
 };
 
+const runBananaInference = async (modelKey: string, modelParameters: any) => {
+    console.log(BANANA_API_KEY);
+    console.log(modelKey)
+    console.log(modelParameters)
+    
+    return await banana.run(BANANA_API_KEY || '', modelKey, modelParameters);
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Routes
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,12 +361,19 @@ app.post('/runPachctlCommand', async (req, res) => {
     });
 });
 
+app.post('/runBananaInference', async (req, res) => {
+    console.log(req.body)
+    res.send(
+        await runBananaInference(req.body.modelKey, req.body.modelParameters),
+    );
+});
+
 app.post('/buildContainer', async (req, res) => {
     // used from edith.lol
-    const {files} = req.body;
-    console.log(files);
-    const {name} = req.body;
-    console.log(name);
+    const { files } = req.body;
+    // console.log(files);
+    const { name } = req.body;
+    // console.log(name);
 
     const preparedResponse: any = {};
 
@@ -370,13 +387,9 @@ app.post('/buildContainer', async (req, res) => {
         console.log(`Created temp directory: ${tmpDir}`);
 
         Object.keys(files).forEach((toWriteFile: any) => {
-            fs.writeFileSync(
-                `${tmpDir}/${toWriteFile}`,
-                files[toWriteFile],
-                {
-                    encoding: 'utf8',
-                },
-            );
+            fs.writeFileSync(`${tmpDir}/${toWriteFile}`, files[toWriteFile], {
+                encoding: 'utf8',
+            });
         });
 
         const edithConfig = tagMerger(
