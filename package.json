@@ -24,6 +24,7 @@
     "@banana-dev/banana-dev": "^4.0.0",
     "@brocorplabs/config": "^0.1.1",
     "@slack/web-api": "^6.4.0",
+    "@tandil/diffparse": "^0.2.0",
     "auto-git-update": "^2.0.2",
     "cheerio": "^1.0.0-rc.10",
     "clarinet": "^0.12.5",

@@ -20,6 +20,8 @@ import fetch from 'node-fetch';
 import AutoGitUpdate from 'auto-git-update';
 // @ts-ignore
 import PushBullet from 'pushbullet';
+// @ts-ignore
+import parser from '@tandil/diffparse'
 import * as dotenv from 'dotenv'; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 dotenv.config();
 
@@ -341,8 +343,16 @@ const runBananaInference = async (modelKey: string, modelParameters: any) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.get('/', (req, res) => {
-    res.send({ message: 'Edith Ok!' });
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
+
+app.get('/app.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'app.js'));
+});
+
+app.get('/style.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'style.css'));
+})
 
 app.post('/post', (req, res) => {
     res.send('Ack!');
@@ -374,6 +384,8 @@ app.post('/buildContainer', async (req, res) => {
     // console.log(files);
     const { name } = req.body;
     // console.log(name);
+    const { tag } = req.body;
+    // console.log(tag);
 
     const preparedResponse: any = {};
 
@@ -393,8 +405,8 @@ app.post('/buildContainer', async (req, res) => {
         });
 
         const edithConfig = tagMerger(
-            Hjson.parse(files['edith-config.hjson']),
-            uuidv4(),
+            {},
+            tag,
         );
 
         const t0 = performance.now();
@@ -424,7 +436,8 @@ app.post('/buildContainer', async (req, res) => {
         ] = `${containerRegistry}/edith-images:${name}_${edithConfig['tag']}`;
 
         const t1 = performance.now();
-    } catch {
+    } catch (e) {
+        console.error(e);
         // handle error
     } finally {
         try {
@@ -441,6 +454,16 @@ app.post('/buildContainer', async (req, res) => {
 
     res.send(preparedResponse);
 });
+
+app.post('/getDiff', async (req: any, res: any) => {
+const { diff } = req.body;
+console.log('diffing...');
+
+const diffedObj = await parser.parseDiffString(diff);
+
+res.send(diffedObj);
+});
+
 
 app.post('/buildContainers', (req: any, res: any) => {
     console.log('Building containers!');
