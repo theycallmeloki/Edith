@@ -1,49 +1,57 @@
 const app = Vue.createApp({
-    template: `
-    <div class="columns">
-    <div class="column is-8">
-    <div v-for="(value,key) in keys" :key="key" style="">
-    <button @click="toggleAccordian(key)" class="button">{{ key }}</button>
-    <div v-if="keys[key].show">
-    <div v-for="(innerValue, innerKey) in value">
-    <div v-for="(line, lineId) in innerValue['content']" style="margin: 10px; display: flex; align-items: center">
-    <button style="margin-right: 10px" class="button" @click="toggleLine(lineId, line)">{{ lineId }}</button>
-    <input type="checkbox" :id="lineId" :value="lineId">
-    <span style="margin-left: 10px">
-    <span v-if="line.startsWith('+')" style="background-color: #90EE90">
-    {{ line }}
-    </span>
-    <span v-if="line.startsWith('-')" style="background-color: #FF6347">
-    {{ line }}
-    </span>
-    <span v-if="!line.startsWith('+') && !line.startsWith('-')">
-    {{ line }}
-    </span>
-    </span>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    <div class="column">
-    <button @click="getDiff()" class="button">Refresh</button>
-    <button class="button" @click="copyToClipboard()" >Copy</button>
-    <h3>Input condition</h3>
-    <input type="text" placeholder="Enter condition">
-    <div style="width: 100%">
-    <div v-for="(value,key) in lines" :key="key" style="display: flex; align-items: center">
-    <input type="checkbox" :id="key" :value="key">
-    <label :for="key">{{ key }}</label>
-    {{value}}
-    </div>
-    </div>
-    </div>
-    </div>
-    `,
     data() {
         return {
             keys: {},
-            lines: []
+            lines: [],
+            inpCon: '',
+            options: [
+                {"name": "SaaS","value": "appTypeSaas"},
+                {"name": "Landing","value": "appTypeLanding"},
+                {"name": "E-Commerce","value": "appTypeEcommerce"},
+                {"name": "Web3","value": "appTypeWeb3"},
+                {"name": "React","value": "frameworkReact"},
+                {"name": "Next","value": "frameworkNext"},
+                {"name": "Gatsby","value": "frameworkGatsby"},
+                {"name": "Material UI","value": "uiKitMaterialUi"},
+                {"name": "Bootstrap","value": "uiKitBootstrap"},
+                {"name": "Bulma","value": "uiKitBulma"},
+                {"name": "Tailwind","value": "uiKitTailwind"},
+                {"name": "Firebase","value": "authFirebase"},
+                {"name": "Supabase Auth","value": "authSupabaseAuth"},
+                {"name": "Auth0","value": "authAuth0"},
+                {"name": "Auth Other","value": "authOther"},
+                {"name": "Auth None","value": "authNone"},
+                {"name": "Firebase","value": "databaseFirebase"},
+                {"name": "Supabase DB","value": "databaseSupabaseDb"},
+                {"name": "Database Other","value": "databaseOther"},
+                {"name": "Database None","value": "databaseNone"},
+                {"name": "Stripe","value": "paymentStripe"},
+                {"name": "Stripe Elements","value": "paymentStripeElements"},
+                {"name": "Payment None","value": "paymentNone"},
+                {"name": "Vercel","value": "hostingVercel"},
+                {"name": "Netlify","value": "hostingNetlify"},
+                {"name": "Hosting Other","value": "hostingOther"},
+                {"name": "Mailchimp","value": "newsletterMailchimp"},
+                {"name": "Convert Kit","value": "newsletterConvertkit"},
+                {"name": "Newsletter Other","value": "newsletterOther"},
+                {"name": "Formspree","value": "contactFormFormspree"},
+                {"name": "Google Sheets","value": "contactFormGoogleSheets"},
+                {"name": "Airtable","value": "contactFormAirtable"},
+                {"name": "SES","value": "contactFormAmazonSes"},
+                {"name": "Form Other","value": "contactFormOther"},
+                {"name": "Google Analytics","value": "analyticsGoogleAnalytics"},
+                {"name": "Mixpanel","value": "analyticsMixpanel"},
+                {"name": "Amplitude","value": "analyticsAmplitude"},
+                {"name": "Segment","value": "analyticsSegment"},
+                {"name": "Simple Analytics","value": "analyticsSimpleAnalytics"},
+                {"name": "Analytics None","value": "analyticsNone"},
+                {"name": "Crisp","value": "chatCrisp"},
+                {"name": "Intercom","value": "chatIntercom"},
+                {"name": "Chat None","value": "chatNone"},
+                {"name": "Starter Kit 1","value": "starterKit0"},
+                {"name": "Starter Kit 2","value": "starterKit1"},
+                {"name": "Starter Kit 3","value": "starterKit2"},
+            ]
         }
     },
     methods: {
@@ -56,23 +64,44 @@ const app = Vue.createApp({
             // diff.forEach((key) => { this.keys[key] = { show: false } });
             console.log(files)
             this.keys = diff;
+            this.lines = [];
         },
         toggleAccordian(key) {
             this.keys[key].show = !this.keys[key].show;
         },
         toggleLine(lineId, lineContent) {
-            console.log(lineId, lineContent)
+            // console.log(lineId, lineContent)
             const line = document.getElementById(lineId);
             line.content = lineContent;
             line.checked = !line.checked;
-            this.lines.push({checked: line.checked, content: line.content.slice(1)});
+            this.lines.push(line.content.slice(1));
+        },
+        toggleOption(option) {
+            this.inpCon = option;
+        },
+        async copyToClipboard() {
+            
+            // this section is for code previous to the pastable region
+            this.lines.unshift(`
+{% if ${this.inpCon} %}
+{% raw %}
+            `)
+            // pastable section top ends here
+            
+            // this section is for code after the pastable region
+            this.lines.push(`
+{% endraw %}
+{% endif %}
+            `)
+            // pastable section bottom ends here
+            const text = this.lines.join('\n');
+            console.log(text)
+            await unsecuredCopyToClipboard(text);
         }
     },
     watch: {
-        lines: {
-            handler: function (val, oldVal) {
-                console.log(val);
-            }
+        lines (newVal) {
+            console.log(newVal);
         }
     },
     beforeMount() {

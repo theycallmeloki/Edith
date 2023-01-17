@@ -9,9 +9,66 @@
     <title>Edith Control Center</title>
 </head>
 <body>
-    <div id="app"></div>
-    <script src="https://unpkg.com/vue@3.0.5"></script>
-    <script src="app.js"></script>
+    <div id="app"><div class="columns">
+        <div class="column is-6">
+            <div v-for="(value,key) in keys" :key="key" style="">
+                <button @click="toggleAccordian(key)" class="button">{{ key }}</button>
+                <div v-if="keys[key].show">
+                    <div v-for="(innerValue, innerKey) in value">
+                        <div v-for="(line, lineId) in innerValue['content']" style="margin: 10px; display: flex; align-items: center">
+                            <button style="margin-right: 10px" class="button" @click="toggleLine(lineId, line)">{{ lineId }}</button>
+                            <input type="checkbox" :id="lineId" :value="lineId">
+                            <span style="margin-left: 10px">
+                                <span v-if="line.startsWith('+')" style="background-color: #90EE90">
+                                    {{ line }}
+                                </span>
+                                <span v-if="line.startsWith('-')" style="background-color: #FF6347">
+                                    {{ line }}
+                                </span>
+                                <span v-if="!line.startsWith('+') && !line.startsWith('-')">
+                                    {{ line }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <button @click="getDiff()" class="button">Refresh</button>
+            <button class="button" @click="copyToClipboard()" >Copy</button>
+            <h3>Input condition</h3>
+            <div class="buttons">
+                <button v-for="toggleOpt in options" @click="toggleOption(toggleOpt.value)" class="button is-small">{{ toggleOpt.name }}</button>
+            </div>
+            <input type="text" placeholder="Enter condition" v-model="inpCon">
+            <button class="button" @click="copyToClipboard()" >Copy</button>
+            <pre style="width: 100%" style="font-style: normal; overflow-x: scroll; font-size: 6px !important;">
+                <template v-for="(value,key) in lines" :key="key">
+{{value}}
+                </template>
+            </pre>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue@3.0.5"></script>
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+<script src="app.js"></script>
+<script>
+    function unsecuredCopyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err);
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
 </body>
 
 </html>
