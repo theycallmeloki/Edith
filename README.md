@@ -8,7 +8,7 @@ Background:
 
 As a hipster sys-admin developer advocate, lurking on cloud-native, with an M1 macbook, I hit a severe roadblock being unable to build containers for x86_64 for use in cloud environments, most of which wouldn't accept an arm build, to overcome the same, `Edith` was created as a CI stopgap until docker buildx caught up on m1, along the way, I discovered [Metacontroller](https://github.com/metacontroller/metacontroller) and [Pachyderm](https://github.com/pachyderm/pachyderm) and found myself being able to ship infrastructure pieces supafast, I call this pattern `Do this, then that` or `DTTT`
 
-If none of this makes sense to you, much to learn you have, young padawan
+If none of this makes sense to you, much to learn you have, young padawan, join me, and together we'll rule the galaxy!
 
 ## To setup:
 
@@ -30,6 +30,7 @@ SLACK_API_KEY=
 DOCKERHUB_USERNAME=
 DOCKERHUB_PASSWORD=
 PUSHBULLET_API_KEY=
+BANANA_API_KEY=
 ```
 
 
