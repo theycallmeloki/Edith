@@ -174,13 +174,14 @@ const purgeTagsForContainer = async (containerName: string, tag: string) => {
 const runPachctlCommand = (args: any[], stdinData: string, callback: any) => {
     // console.log('Starting Process.');
 
-    if (args[0] !== 'get' && args[1] !== 'file') {
+    if ((args[0] !== 'get' && args[1] !== 'file') && (args[0] !== "create" && args[1] !== "repo") ) {
         args.push('--raw');
         args.push('|');
         args.push('jq');
         args.push('-sr');
         args.push('.');
     }
+
     const line = args.join(' ');
 
     const child = spawn('sh', ['-c', `pachctl ${line}`]);
