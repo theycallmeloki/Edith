@@ -171,7 +171,7 @@ const purgeTagsForContainer = async (containerName: string, tag: string) => {
     }
 };
 
-const runPachctlCommand = (args: any[], callback: any) => {
+const runPachctlCommand = (args: any[], stdinData: string, callback: any) => {
     // console.log('Starting Process.');
 
     if (args[0] !== 'get' && args[1] !== 'file') {
@@ -184,6 +184,11 @@ const runPachctlCommand = (args: any[], callback: any) => {
     const line = args.join(' ');
 
     const child = spawn('sh', ['-c', `pachctl ${line}`]);
+
+    if (stdinData) {
+        child.stdin.write(stdinData);
+        child.stdin.end();
+    }
 
     let scriptOutput = '';
 
@@ -366,7 +371,7 @@ app.post('/build', async (req, res) => {
 });
 
 app.post('/runPachctlCommand', async (req, res) => {
-    runPachctlCommand(req.body.args, function (output: any, exitCode: any) {
+    runPachctlCommand(req.body.args, req.body.stdin, function (output:any, exitCode:any) {
         res.send(output);
     });
 });
