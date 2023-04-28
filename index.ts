@@ -171,42 +171,82 @@ const purgeTagsForContainer = async (containerName: string, tag: string) => {
     }
 };
 
-const runPachctlCommand = (args: any[], callback: any) => {
-    // console.log('Starting Process.');
-
+// newer version of pachctl
+const runPachctlCommand = (args: any[], callback: any, stdinData: string) => {
     if (args[0] !== 'get' && args[1] !== 'file') {
-        args.push('--raw');
-        args.push('|');
-        args.push('jq');
-        args.push('-sr');
-        args.push('.');
+      args.push('--raw');
+      args.push('|');
+      args.push('jq');
+      args.push('-sr');
+      args.push('.');
     }
     const line = args.join(' ');
-
+  
     const child = spawn('sh', ['-c', `pachctl ${line}`]);
-
+  
+    if (stdinData) {
+      child.stdin.write(stdinData);
+      child.stdin.end();
+    }
+  
     let scriptOutput = '';
-
+  
     child.stdout.setEncoding('utf8');
     child.stdout.on('data', function (data: any) {
-        // console.log('stdout: ' + data);
-
-        data = data.toString();
-        scriptOutput += data;
+      data = data.toString();
+      scriptOutput += data;
     });
-
+  
     child.stderr.setEncoding('utf8');
     child.stderr.on('data', function (data: any) {
-        // console.log('stderr: ' + data);
-
-        data = data.toString();
-        scriptOutput += data;
+      data = data.toString();
+      scriptOutput += data;
     });
-
+  
     child.on('close', function (code: any) {
-        callback(scriptOutput, code);
+      callback(scriptOutput, code);
     });
-};
+  };
+  
+
+// older version
+
+// const runPachctlCommand = (args: any[], callback: any) => {
+//     // console.log('Starting Process.');
+
+//     if (args[0] !== 'get' && args[1] !== 'file') {
+//         args.push('--raw');
+//         args.push('|');
+//         args.push('jq');
+//         args.push('-sr');
+//         args.push('.');
+//     }
+//     const line = args.join(' ');
+
+//     const child = spawn('sh', ['-c', `pachctl ${line}`]);
+
+//     let scriptOutput = '';
+
+//     child.stdout.setEncoding('utf8');
+//     child.stdout.on('data', function (data: any) {
+//         // console.log('stdout: ' + data);
+
+//         data = data.toString();
+//         scriptOutput += data;
+//     });
+
+//     child.stderr.setEncoding('utf8');
+//     child.stderr.on('data', function (data: any) {
+//         // console.log('stderr: ' + data);
+
+//         data = data.toString();
+//         scriptOutput += data;
+//     });
+
+//     child.on('close', function (code: any) {
+//         callback(scriptOutput, code);
+//     });
+// };
 
 const runBuildPushContainer = ({
     containerName = 'edith-images',
