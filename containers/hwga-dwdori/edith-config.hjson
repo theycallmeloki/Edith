@@ -11,8 +11,11 @@
   "postPushHook": {
     "cmdList": [],
     "k8s": {
-      "selfLocation": "./containers/hwga-dwdori",
-      "blueGreenDeploymentName": "hwga-dwdori"
+      "replicas": 1,
+      "minReadySeconds": 5, 
+      "containerPort": 8080,
+      "servicePort": 80,
+      "nodePort": 31000
     }
   }
 }
