@@ -43,7 +43,7 @@ const BANANA_API_KEY = process.env['BANANA_API_KEY'];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const app = express();
-const port = 8890;
+const port = 8888;
 app.use(cors());
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb'}));
