@@ -214,6 +214,41 @@ const runPachctlCommand = (args: any[], stdinData: string, callback: any) => {
     });
 };
 
+const runKubectlCommand = (args: any[], stdinData: string, callback: any) => {
+    // console.log('Starting Process.');
+
+    const line = args.join(' ');
+
+    const child = spawn('sh', ['-c', `kubectl ${line}`]);
+
+    if (stdinData) {
+        child.stdin.write(stdinData);
+        child.stdin.end();
+    }
+
+    let scriptOutput = '';
+
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', function (data: any) {
+        // console.log('stdout: ' + data);
+
+        data = data.toString();
+        scriptOutput += data;
+    });
+
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', function (data: any) {
+        // console.log('stderr: ' + data);
+
+        data = data.toString();
+        scriptOutput += data;
+    });
+
+    child.on('close', function (code: any) {
+        callback(scriptOutput, code);
+    });
+};
+
 const runBuildPushContainer = ({
     containerName = 'edith-images',
     folderName,
@@ -373,6 +408,12 @@ app.post('/build', async (req, res) => {
 
 app.post('/runPachctlCommand', async (req, res) => {
     runPachctlCommand(req.body.args, req.body.stdin, function (output:any, exitCode:any) {
+        res.send(output);
+    });
+});
+
+app.post('/runKubectlCommand', async (req, res) => {
+    runKubectlCommand(req.body.args, req.body.stdin, function (output: any, exitCode: any) {
         res.send(output);
     });
 });
