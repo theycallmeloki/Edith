@@ -3,22 +3,22 @@
   "prePushHook": {
     "cmdList": [
       "git clone https://github.com/enarjord/passivbot.git staging/passivbot",
-      "mv staging/passivbot/* ./containers/crypto-passivbot"
-      "cp default.hjson ./containers/crypto-passivbot/default.hjson"
+      // "mv staging/passivbot/* ./containers/crypto-passivbot"
+      // "cp default.hjson ./containers/crypto-passivbot/default.hjson"
     ]
   },
   "postPushHook": {
-    "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
+    // "cmdList": ["pachctl create pipeline -f /tmp/thispipeline.json"],
     "pipeline": {
-      "pipeline": {
-        "name": "passivbot"
-      },
+      // "pipeline": {
+        // "name": "passivbot"
+      // },
       "transform": {
-        "image_pull_secrets": [
-          "laneonekey"
-        ],
+        // "image_pull_secrets": [
+          // "laneonekey"
+        // ],
         "cmd": ["python3", "harmony_search.py", "-u", "binance_01", "-s", "ETHUSDT", "-o", "default.hjson"],
-        "image": ""
+        // "image": ""
       }
     }
   }
