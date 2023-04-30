@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Request, Response} from 'express';
 import cors from 'cors';
 import { execSync, spawn } from 'child_process';
 import { performance } from 'perf_hooks';
@@ -37,6 +37,23 @@ const DOCKERHUB_USERNAME = process.env['DOCKERHUB_USERNAME'];
 const DOCKERHUB_PASSWORD = process.env['DOCKERHUB_PASSWORD'];
 const PUSHBULLET_API_KEY = process.env['PUSHBULLET_API_KEY'];
 const BANANA_API_KEY = process.env['BANANA_API_KEY'];
+
+// Rotating keys for Etherscan and Arbiscan
+
+const etherscanApiKeys = process.env['ETHERSCAN_API_KEYS'] ? process.env['ETHERSCAN_API_KEYS'].split(',') : [];
+const arbiscanApiKeys = process.env['ARBISCAN_API_KEYS'] ? process.env['ARBISCAN_API_KEYS'].split(',') : [];
+
+const apiKeys: Record<string, string[]> = {
+    etherscan: etherscanApiKeys,
+    arbiscan: arbiscanApiKeys,
+    // Add more types and their API keys as needed
+};
+
+const currentIndices: Record<string, number> = {
+    etherscan: 0,
+    arbiscan: 0,
+    // Add more types and initialize their indices to 0
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initializations
@@ -406,6 +423,27 @@ app.post('/build', async (req, res) => {
     res.send('Building!');
     await updater.forceUpdate();
 });
+
+app.get("/apiKey", (req: Request, res: Response) => {
+    const keyType = req.query.keyType as string; // Add an explicit type assertion here
+
+    if (!keyType || !apiKeys[keyType]) {
+        return res.status(400).json({ error: "Invalid keyType" });
+    }
+
+    // check if the user is authenticated in header
+    // if not, return 401
+
+    if (req.headers.authorization !== "Bearer " + process.env['GITHUB_TOKEN']) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const apiKey = apiKeys[keyType][currentIndices[keyType]];
+    currentIndices[keyType] = (currentIndices[keyType] + 1) % apiKeys[keyType].length;
+    console.log("sending", apiKey, "for", keyType)
+    res.json({ apiKey });
+});
+  
 
 app.post('/runPachctlCommand', async (req, res) => {
     runPachctlCommand(req.body.args, req.body.stdin, function (output:any, exitCode:any) {
