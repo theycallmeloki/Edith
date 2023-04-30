@@ -190,7 +190,8 @@ const purgeTagsForContainer = async (containerName: string, tag: string) => {
 };
 
 const runPachctlCommand = (args: any[], stdinData: string, callback: any) => {
-    // console.log('Starting Process.');
+    console.log('Starting Process (Pachctl).');
+    console.log('DEBUG: ', args, stdinData, callback);
 
     if ((args[0] !== 'get' && args[1] !== 'file') && (args[0] !== "create" && args[1] !== "repo") ) {
         args.push('--raw');
@@ -233,7 +234,8 @@ const runPachctlCommand = (args: any[], stdinData: string, callback: any) => {
 };
 
 const runKubectlCommand = (args: any[], stdinData: string, callback: any) => {
-    // console.log('Starting Process.');
+    console.log('Starting Process (Kubectl).');
+    console.log('DEBUG: ', args, stdinData, callback);
 
     const line = args.join(' ');
 
