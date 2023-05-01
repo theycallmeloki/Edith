@@ -403,6 +403,112 @@ const runBananaInference = async (modelKey: string, modelParameters: any) => {
 // Routes
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+
+
+const axios = require('axios');
+const cheerio = require('cheerio');
+
+class BoringproxyBaseAPI {
+  constructor(serverHost, accessToken) {
+    this.serverHost = serverHost;
+    this.accessToken = accessToken;
+    this.headers = { Authorization: 'Bearer ' + this.accessToken };
+    this.usersEndpoint = `https://${this.serverHost}/users`;
+    this.deleteUserEndpoint = `https://${this.serverHost}/delete-user`;
+    this.tokensEndpoint = `https://${this.serverHost}/tokens`;
+    this.clientsEndpoint = `https://${this.serverHost}/clients`;
+    this.deleteClientEndpoint = `https://${this.serverHost}/delete-client`;
+    this.tunnelsEndpoint = `https://${this.serverHost}/tunnels`;
+    this.deleteTunnelEndpoint = `https://${this.serverHost}/delete-tunnel`;
+  }
+}
+
+class BoringproxyAdminAPI extends BoringproxyBaseAPI {
+  constructor(serverHost, accessToken) {
+    super(serverHost, accessToken);
+  }
+
+  async getUsers() {
+    // Add your getUsers implementation
+  }
+
+  async createUser(username) {
+    // Add your createUser implementation
+  }
+
+  async deleteUser(username) {
+    // Add your deleteUser implementation
+  }
+
+  async checkUser(username) {
+    // Add your checkUser implementation
+  }
+
+  async createFullUser(username) {
+    // Add your createFullUser implementation
+  }
+
+  async getUsersTokens() {
+    // Add your getUsersTokens implementation
+  }
+
+  async createToken(username, client = 'any') {
+    // Add your createToken implementation
+  }
+
+  async getUserToken(username) {
+    // Add your getUserToken implementation
+  }
+}
+
+class BoringproxyUserAPI extends BoringproxyBaseAPI {
+  constructor(serverHost, userName, accessToken) {
+    super(serverHost, accessToken);
+    this.userName = userName;
+  }
+
+  async getClients() {
+    // Add your getClients implementation
+  }
+
+  async createClient(name) {
+    // Add your createClient implementation
+  }
+
+  async deleteClient(name) {
+    // Add your deleteClient implementation
+  }
+}
+
+class BoringproxyClientAPI {
+  constructor(user, name) {
+    this.user = user;
+    this.name = name;
+  }
+
+  async getTunnels() {
+    // Add your getTunnels implementation
+  }
+
+  async createTunnel(domain, port, tunnelPort = 'Random', clientAddr = '127.0.0.1', tlsTermination = 'client', allowExternalTcp = false, passwordProtect = false, username = null, password = null) {
+    // Add your createTunnel implementation
+  }
+
+  async deleteTunnel(port) {
+    // Add your deleteTunnel implementation
+  }
+}
+
+module.exports = {
+  BoringproxyAdminAPI,
+  BoringproxyUserAPI,
+  BoringproxyClientAPI,
+};
+
+
+*/
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
