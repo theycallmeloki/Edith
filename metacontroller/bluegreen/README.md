@@ -12,6 +12,12 @@ Finally, it scales down the old ReplicaSet.
 
 * Install [Metacontroller](https://github.com/metacontroller/metacontroller)
 
+# Apply all set of production resources defined in kustomization.yaml in `production` directory .
+kubectl apply -k https://github.com/metacontroller/metacontroller/manifests/production
+
+
+
+
 ### Deploy the controller
 
 ```sh
